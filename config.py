@@ -18,7 +18,7 @@ channel_log = int(os.getenv("CHANNEL_LOG", "#"))
 # =========================================================== #
 
 id_admin = int(os.getenv("ID_ADMIN", "2073506739"))
-id_amang = int(os.getenv("ID_AMANG", "2073506739"))
+id_amang = int(os.getenv("ID_AMANG", "6520271722"))
 # =========================================================== #
 
 batas_kirim = int(os.getenv("BATAS_KIRIM", "5"))
@@ -58,3 +58,4 @@ gagalkirim_msg = os.getenv("GAGAL_KIRIM", """
 #Spill (Untuk Spill Masalah)
 #Find (Untuk Mencari Pasangan, Teman, Partner FWB)
 """)
+
