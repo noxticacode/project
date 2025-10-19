@@ -7,7 +7,7 @@ from pyrogram.types import BotCommand, BotCommandScopeAllPrivateChats
 data = []
 
 class Bot(Client):
-    def __init__(self):
+    def __init__(self, scheduler=None): # Menerima instance scheduler
         super().__init__(
             'menfess_bot',
             api_id=config.api_id,
@@ -17,6 +17,8 @@ class Bot(Client):
             },
             bot_token=config.bot_token
         )
+        self.scheduler = scheduler # Menyimpan instance scheduler
+        
     async def start(self):
         await super().start()
         bot_me = await self.get_me()
@@ -30,30 +32,24 @@ class Bot(Client):
         print(f"[!] Link Database Kamu : {config.db_url}")
         print("================")
 
-        if config.channel_1:
-            try:
-                await self.export_chat_invite_link(config.channel_1)
-            except:
-                print(f'Harap periksa kembali ID [ {config.channel_1} ] pada channel 1')
-                print(f'Pastikan bot telah dimasukan kedalam channel dan menjadi admin')
-                print('-> Bot terpaksa dihentikan')
-                sys.exit()
-        if config.channel_2:
-            try:
-                await self.export_chat_invite_link(config.channel_1)
-            except:
-                print(f'Harap periksa kembali ID [ {config.channel_2} ] pada channel 2')
-                print(f'Pastikan bot telah dimasukan kedalam channel dan menjadi admin')
-                print('-> Bot terpaksa dihentikan')
-                sys.exit()
-        if config.channel_log:
-            try:
-                await self.export_chat_invite_link(config.channel_log)
-            except:
-                print(f'Harap periksa kembali ID [ {config.channel_log} ] pada channel log')
-                print(f'Pastikan bot telah dimasukan kedalam channel dan menjadi admin')
-                print('-> Bot terpaksa dihentikan')
-                sys.exit()
+        # FIX: Pengecekan bot sebagai admin di semua channel yang dikonfigurasi
+        channels_to_check = [
+            (config.channel_1, 'channel 1'), 
+            (config.channel_2, 'channel 2'), 
+            (config.channel_log, 'channel log')
+        ]
+        
+        for channel_id, channel_name in channels_to_check:
+            # Lewati jika ID channel tidak diatur atau menggunakan placeholder default
+            if channel_id and channel_id != -100:
+                try:
+                    # export_chat_invite_link akan gagal jika bot bukan admin
+                    await self.export_chat_invite_link(channel_id) 
+                except Exception as e:
+                    print(f'Harap periksa kembali ID [ {channel_id} ] pada {channel_name}')
+                    print(f'Pastikan bot telah dimasukan kedalam channel dan menjadi admin. Error: {e}')
+                    print('-> Bot terpaksa dihentikan')
+                    sys.exit()
 
         self.username = bot_me.username
         self.id_bot = bot_me.id
@@ -64,11 +60,19 @@ class Bot(Client):
             BotCommand('moansboy', '🧘 moans boy'), BotCommand('gfrent', '🤵 girl friend rent'),
             BotCommand('bfrent', '🤵 boy friend rent')
         ], BotCommandScopeAllPrivateChats())
+
+        # FIX: Memulai scheduler di dalam event loop Pyrogram
+        if self.scheduler:
+            self.scheduler.start()
+            print("[!] Scheduler berhasil diaktifkan")
         
         print('BOT TELAH AKTIF')
     
     async def stop(self):
         await super().stop()
+        # Mematikan scheduler dengan aman
+        if self.scheduler:
+            self.scheduler.shutdown()
         print('BOT BERHASIL DIHENTIKAN')
     
     async def kirim_pesan(self, x: str):
