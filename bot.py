@@ -7,7 +7,7 @@ from pyrogram.types import BotCommand, BotCommandScopeAllPrivateChats
 data = []
 
 class Bot(Client):
-    def __init__(self, scheduler=None): # Menerima instance scheduler
+    def __init__(self, scheduler=None):
         super().__init__(
             'menfess_bot',
             api_id=config.api_id,
@@ -17,7 +17,7 @@ class Bot(Client):
             },
             bot_token=config.bot_token
         )
-        self.scheduler = scheduler # Menyimpan instance scheduler
+        self.scheduler = scheduler
         
     async def start(self):
         await super().start()
