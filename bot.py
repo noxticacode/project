@@ -9,7 +9,7 @@ data = []
 class Bot(Client):
     def __init__(self, scheduler=None):
         super().__init__(
-            'menfess_bot',
+            'menfess_bot_v2',
             api_id=config.api_id,
             api_hash=config.api_hash,
             plugins={
@@ -84,3 +84,4 @@ class Bot(Client):
         a = requests.get(f'{url}/sendMessage?chat_id={config.channel_log}&text={pesan}&parse_mode=HTML').json()
         requests.post(f'{url}/pinChatMessage?chat_id={config.channel_log}&message_id={a["result"]["message_id"]}&parse_mode=HTML')
         requests.post(f'{url}/deleteMessage?chat_id={config.channel_log}&message_id={a["result"]["message_id"] + 1}&parse_mode=HTML')
+
